@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Axios from "axios";
 import AsyncSelect from 'react-select/async';
 import Select from 'react-select';
@@ -19,7 +19,7 @@ function App() {
   const options = [
     { value: "1", label: "tshirts" },
     { value: "2", label: "shoes" },
-    { value: "3", label: "jeans" },
+
   ];
 
   //handle input chhange event
@@ -33,27 +33,42 @@ function App() {
     setSelectedValue(value);
   }
 
+  useEffect(() => {
+    getProducts();
+  }, []);
+
 
   const addProduct = () => {
+    let value = selectedvalue.value;
+    console.log({ "name": Name, "id": value });
+    console.log(selectedvalue);
     Axios.post("http://localhost:5000/api/product", {
       Name: Name,
-      productType_id: productType_id,
+      productType_id: value,
 
+
+      /* }).then(() => {
+         setProductList([
+           ...productList,
+           {
+             Name: Name,
+             ProductType: selectedvalue.label,
+   
+           },
+         ]);
+       });*/
     }).then(() => {
-      setProductList([
-        ...productList,
-        {
-          Name: Name,
-          ProductType: productType_id,
-
-        },
-      ]);
+      // Axios.get("http://localhost:5000/api/product").then((response) => {
+      //setProductList(response.data);
+      // });
+      getProducts();
     });
   };
 
 
 
   const getProducts = () => {
+    console.log("im here ");
     Axios.get("http://localhost:5000/api/product").then((response) => {
       setProductList(response.data);
       console.log(response.data);
@@ -73,30 +88,30 @@ function App() {
     });
 
   };
-  const getP = () => {
-    console.log(producttpesList);
-
-  };
-  //getProductsTypes();
 
   const updateProduct = (id) => {
-    Axios.put(`http://localhost:5000/api/product/${id}`, { Name: newName }).then(
-      (response) => {
-        setProductList(
-          productList.map((val) => {
-            return val.id == id
-              ? {
-                Name: newName,
+    Axios.put(`http://localhost:5000/api/product/${id}`, { Name: newName })
+    {
+      console.log("wssslat");
+      getProducts();
+      console.log("wssslat2");
+      /*setProductList(
+        productList.map((val) => {
+          return val.id == id
+            ? {
+              Name: newName,
 
-                ProductType: val.productType_id,
-              }
-              : val;
-          })
-        );
+              ProductType: val.productType_id,
+            }
+            : val;
+        })
+      );*/
 
-      }
 
-    );
+
+    }
+
+
 
   };
 
@@ -122,6 +137,7 @@ function App() {
     <div className="App">
       <div className="information">
         <label>Name:</label>
+
         <input
           type="text"
           onChange={(event) => {
@@ -137,16 +153,19 @@ function App() {
           onChange={setSelectedValue}
           options={options}
         />
+        <br />
 
 
 
 
+        <button onClick={addProduct} type="submit">Add Product</button>
+        <br />
 
-        <button onClick={addProduct}>Add Product</button>
 
       </div>
       <div className="products">
-        <button onClick={getProducts}>Show Products</button>
+        <button onClick={getProducts}>Refresh After Update</button>
+
 
         {productList.map((val, key) => {
           return (
@@ -180,6 +199,7 @@ function App() {
                   >
                     Delete
                   </button>
+
                 </div>
               </div>
 
@@ -192,3 +212,4 @@ function App() {
 }
 
 export default App;
+
